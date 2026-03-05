@@ -1,4 +1,4 @@
-use pkl::{EvaluatorManager, EvaluatorOptions, ModuleSource};
+use pklrs::{EvaluatorManager, EvaluatorOptions, ModuleSource};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]

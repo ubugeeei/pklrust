@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use pkl::de::from_pkl_value;
-use pkl::value::{ObjectMember, PklValue};
+use pklrs::de::from_pkl_value;
+use pklrs::value::{ObjectMember, PklValue};
 use serde::Deserialize;
 
 #[test]
@@ -217,7 +217,7 @@ fn test_deserialize_duration() {
         unit: String,
     }
 
-    let dur = PklValue::Duration(pkl::Duration::new(30.0, pkl::DurationUnit::S));
+    let dur = PklValue::Duration(pklrs::Duration::new(30.0, pklrs::DurationUnit::S));
     let result: Timeout = from_pkl_value(&dur).unwrap();
     assert_eq!(
         result,
@@ -236,7 +236,7 @@ fn test_deserialize_data_size() {
         unit: String,
     }
 
-    let ds = PklValue::DataSize(pkl::DataSize::new(256.0, pkl::DataSizeUnit::Mb));
+    let ds = PklValue::DataSize(pklrs::DataSize::new(256.0, pklrs::DataSizeUnit::Mb));
     let result: Size = from_pkl_value(&ds).unwrap();
     assert_eq!(
         result,

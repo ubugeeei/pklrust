@@ -1,5 +1,5 @@
 /// Basic `pkl!` macro usage — write PKL as Rust tokens.
-use pkl::pkl;
+use pklrs::pkl;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let value = pkl! {

@@ -1,5 +1,5 @@
 /// Advanced `pkl!` macro usage — classes, functions, control flow, units.
-use pkl::pkl;
+use pklrs::pkl;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Duration and data size units

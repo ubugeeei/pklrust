@@ -1,9 +1,9 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/pkl",
-    "crates/pkl-derive",
-    "crates/pkl-codegen",
+    "crates/pklrs",
+    "crates/pklrs-derive",
+    "crates/pklrs-codegen",
 ]
 
 [workspace.package]

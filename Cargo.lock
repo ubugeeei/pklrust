@@ -189,11 +189,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
 
 [[package]]
-name = "pkl"
+name = "pklrs"
 version = "0.1.0"
 dependencies = [
  "byteorder",
- "pkl-derive",
+ "pklrs-derive",
  "rmp-serde",
  "rmpv",
  "serde",
@@ -203,14 +203,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "pkl-codegen"
+name = "pklrs-codegen"
 version = "0.1.0"
 dependencies = [
  "clap",
 ]
 
 [[package]]
-name = "pkl-derive"
+name = "pklrs-derive"
 version = "0.1.0"
 dependencies = [
  "proc-macro2",

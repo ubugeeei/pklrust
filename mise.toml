@@ -1,0 +1,45 @@
+[tools]
+rust = "latest"
+
+[tasks.release]
+description = "Bump version, commit, tag, and push (usage: mise run release [major|minor|patch])"
+run = """
+#!/usr/bin/env bash
+set -euo pipefail
+
+BUMP="${1:-patch}"
+
+# Get current version
+CURRENT=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "pklrs") | .version')
+
+IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+
+case "$BUMP" in
+  major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+  minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+  patch) PATCH=$((PATCH + 1)) ;;
+  *) echo "Usage: mise run release [major|minor|patch]"; exit 1 ;;
+esac
+
+NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+echo "Bumping version: ${CURRENT} -> ${NEW_VERSION}"
+
+# Update workspace version
+sed -i.bak "s/^version = \"${CURRENT}\"/version = \"${NEW_VERSION}\"/" Cargo.toml
+rm -f Cargo.toml.bak
+
+# Update pklrs-derive version in pklrs dependency
+sed -i.bak "s/pklrs-derive = { version = \"${CURRENT}\"/pklrs-derive = { version = \"${NEW_VERSION}\"/" crates/pklrs/Cargo.toml
+rm -f crates/pklrs/Cargo.toml.bak
+
+# Update Cargo.lock
+cargo check --workspace 2>/dev/null
+
+git add -A
+git commit -m "release: v${NEW_VERSION}"
+git tag "v${NEW_VERSION}"
+
+echo ""
+echo "Created tag v${NEW_VERSION}"
+echo "Run 'git push origin main && git push origin v${NEW_VERSION}' to publish"
+"""

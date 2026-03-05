@@ -208,8 +208,8 @@ fn pkl_type_to_rust(pkl_type: &str) -> String {
         "UInt" | "UInt8" | "UInt16" | "UInt32" => "u64".into(),
         "Float" => "f64".into(),
         "Boolean" => "bool".into(),
-        "Duration" => "pkl::Duration".into(),
-        "DataSize" => "pkl::DataSize".into(),
+        "Duration" => "pklrs::Duration".into(),
+        "DataSize" => "pklrs::DataSize".into(),
         "Any" => "serde_json::Value".into(),
         "Dynamic" => "serde_json::Value".into(),
         other => other.to_string(), // User-defined type

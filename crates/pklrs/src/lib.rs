@@ -1,4 +1,4 @@
-pub use pkl_derive::pkl;
+pub use pklrs_derive::pkl;
 
 pub mod codec;
 pub mod de;

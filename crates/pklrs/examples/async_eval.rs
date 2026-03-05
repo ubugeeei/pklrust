@@ -5,7 +5,7 @@
 ///
 /// Note: The async evaluator API is currently in development.
 /// For now, the sync API can be used with `tokio::task::spawn_blocking`.
-use pkl::{EvaluatorManager, EvaluatorOptions, ModuleSource};
+use pklrs::{EvaluatorManager, EvaluatorOptions, ModuleSource};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -33,7 +33,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let result: Config = manager.evaluate_module_typed(&evaluator, source)?;
         manager.close_evaluator(&evaluator)?;
-        Ok::<_, pkl::Error>(result)
+        Ok::<_, pklrs::Error>(result)
     })
     .await??;
 

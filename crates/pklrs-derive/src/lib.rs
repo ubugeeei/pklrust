@@ -26,7 +26,7 @@ pub fn derive_from_pkl(input: TokenStream) -> TokenStream {
 /// Evaluate inline PKL source written as tokens.
 ///
 /// Converts the token stream into PKL source and generates code that
-/// evaluates it at runtime, returning `pkl::Result<pkl::PklValue>`.
+/// evaluates it at runtime, returning `pklrs::Result<pklrs::PklValue>`.
 ///
 /// # Supported constructs
 ///
@@ -49,7 +49,7 @@ pub fn derive_from_pkl(input: TokenStream) -> TokenStream {
 /// # Example
 ///
 /// ```ignore
-/// use pkl::pkl;
+/// use pklrs::pkl;
 ///
 /// let value = pkl! {
 ///     host = "localhost"
@@ -67,7 +67,7 @@ pub fn pkl(input: TokenStream) -> TokenStream {
     let pkl_source = pkl_macro::tokens_to_pkl(&trees);
 
     let expanded = quote! {
-        ::pkl::evaluate_text(#pkl_source)
+        ::pklrs::evaluate_text(#pkl_source)
     };
 
     expanded.into()

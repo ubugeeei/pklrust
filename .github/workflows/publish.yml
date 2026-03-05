@@ -12,39 +12,36 @@ jobs:
   publish:
     name: Publish
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
 
-      # Publish in dependency order: pkl-derive -> pkl -> pkl-codegen
-      - name: Publish pkl-derive
-        run: cargo publish -p pkl-derive
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      # Publish in dependency order: pklrs-derive -> pklrs -> pklrs-codegen
+      - name: Publish pklrs-derive
+        run: cargo publish -p pklrs-derive
 
-      - name: Wait for pkl-derive to be available
+      - name: Wait for pklrs-derive to be available
         run: |
-          VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "pkl-derive") | .version')
-          until curl -sf "https://crates.io/api/v1/crates/pkl-derive/$VERSION" > /dev/null; do
-            echo "Waiting for pkl-derive $VERSION on crates.io..."
+          VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "pklrs-derive") | .version')
+          until curl -sf "https://crates.io/api/v1/crates/pklrs-derive/$VERSION" > /dev/null; do
+            echo "Waiting for pklrs-derive $VERSION on crates.io..."
             sleep 5
           done
 
-      - name: Publish pkl
-        run: cargo publish -p pkl
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      - name: Publish pklrs
+        run: cargo publish -p pklrs
 
-      - name: Wait for pkl to be available
+      - name: Wait for pklrs to be available
         run: |
-          VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "pkl") | .version')
-          until curl -sf "https://crates.io/api/v1/crates/pkl/$VERSION" > /dev/null; do
-            echo "Waiting for pkl $VERSION on crates.io..."
+          VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "pklrs") | .version')
+          until curl -sf "https://crates.io/api/v1/crates/pklrs/$VERSION" > /dev/null; do
+            echo "Waiting for pklrs $VERSION on crates.io..."
             sleep 5
           done
 
-      - name: Publish pkl-codegen
-        run: cargo publish -p pkl-codegen
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      - name: Publish pklrs-codegen
+        run: cargo publish -p pklrs-codegen

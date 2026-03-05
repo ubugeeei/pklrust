@@ -2,7 +2,7 @@
 ///
 /// Shows how to reuse a single evaluator for multiple evaluations,
 /// which is more efficient than creating a new one each time.
-use pkl::{EvaluatorManager, EvaluatorOptions, ModuleSource};
+use pklrs::{EvaluatorManager, EvaluatorOptions, ModuleSource};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]

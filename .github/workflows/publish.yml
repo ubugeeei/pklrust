@@ -1,0 +1,50 @@
+name: Publish to crates.io
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      # Publish in dependency order: pkl-derive -> pkl -> pkl-codegen
+      - name: Publish pkl-derive
+        run: cargo publish -p pkl-derive
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Wait for pkl-derive to be available
+        run: |
+          VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "pkl-derive") | .version')
+          until curl -sf "https://crates.io/api/v1/crates/pkl-derive/$VERSION" > /dev/null; do
+            echo "Waiting for pkl-derive $VERSION on crates.io..."
+            sleep 5
+          done
+
+      - name: Publish pkl
+        run: cargo publish -p pkl
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Wait for pkl to be available
+        run: |
+          VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "pkl") | .version')
+          until curl -sf "https://crates.io/api/v1/crates/pkl/$VERSION" > /dev/null; do
+            echo "Waiting for pkl $VERSION on crates.io..."
+            sleep 5
+          done
+
+      - name: Publish pkl-codegen
+        run: cargo publish -p pkl-codegen
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}

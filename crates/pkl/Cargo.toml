@@ -3,6 +3,7 @@ name = "pkl"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
 description = "Rust bindings for Apple Pkl configuration language"
 
 [features]
@@ -18,4 +19,4 @@ serde_json = "1"
 thiserror = "2"
 byteorder = "1"
 tokio = { version = "1", features = ["process", "io-util", "sync", "rt-multi-thread", "macros"], optional = true }
-pkl-derive = { path = "../pkl-derive" }
+pkl-derive = { version = "0.1.0", path = "../pkl-derive" }

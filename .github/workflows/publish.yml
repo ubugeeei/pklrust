@@ -21,88 +21,57 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
 
-      # Publish in dependency order: pklrust-derive -> pklrust -> pklrust-codegen
-      - name: Get OIDC token for pklrust-derive
-        id: oidc-derive
+      - name: Get trusted publishing token
+        id: oidc
         run: |
-          OIDC_RESPONSE=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=crates.io" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
-          OIDC_TOKEN=$(echo "$OIDC_RESPONSE" | jq -r '.value')
-          if [ "$OIDC_TOKEN" = "null" ] || [ -z "$OIDC_TOKEN" ]; then
-            echo "::error::Failed to get OIDC token: $OIDC_RESPONSE"
-            exit 1
-          fi
-          EXCHANGE_RESPONSE=$(curl -sLS 'https://crates.io/api/v1/trusted_publishing/tokens' -H 'Content-Type: application/json' -H 'User-Agent: pklrust CI (github.com/ubugeeei/pklrust)' -d "{\"jwt\": \"$OIDC_TOKEN\"}")
-          CRATES_IO_TOKEN=$(echo "$EXCHANGE_RESPONSE" | jq -r '.token')
+          OIDC_TOKEN=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=crates.io" \
+            -H "User-Agent: actions/oidc-client" \
+            -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
+          CRATES_IO_TOKEN=$(curl -sLS 'https://crates.io/api/v1/trusted_publishing/tokens' \
+            -H 'Content-Type: application/json' \
+            -H 'User-Agent: pklrust CI (github.com/ubugeeei/pklrust)' \
+            -d "{\"jwt\": \"$OIDC_TOKEN\"}" | jq -r '.token')
           if [ "$CRATES_IO_TOKEN" = "null" ] || [ -z "$CRATES_IO_TOKEN" ]; then
-            echo "::error::Failed to exchange OIDC token: $EXCHANGE_RESPONSE"
+            echo "::error::Failed to obtain trusted publishing token"
             exit 1
           fi
           echo "::add-mask::$CRATES_IO_TOKEN"
           echo "token=$CRATES_IO_TOKEN" >> "$GITHUB_OUTPUT"
 
+      # Publish in dependency order: pklrust-derive -> pklrust -> pklrust-codegen
       - name: Publish pklrust-derive
         run: cargo publish -p pklrust-derive
         env:
-          CARGO_REGISTRY_TOKEN: ${{ steps.oidc-derive.outputs.token }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.oidc.outputs.token }}
 
-      - name: Wait for pklrust-derive to be available
+      - name: Wait for pklrust-derive
         run: |
           VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "pklrust-derive") | .version')
-          until curl -sf "https://crates.io/api/v1/crates/pklrust-derive/$VERSION" > /dev/null; do
-            echo "Waiting for pklrust-derive $VERSION on crates.io..."
-            sleep 5
+          for i in $(seq 1 60); do
+            curl -sf "https://crates.io/api/v1/crates/pklrust-derive/$VERSION" \
+              -H 'User-Agent: pklrust CI (github.com/ubugeeei/pklrust)' > /dev/null && exit 0
+            echo "Waiting for pklrust-derive $VERSION... ($i/60)"
+            sleep 10
           done
-
-      - name: Get OIDC token for pklrust
-        id: oidc-pklrust
-        run: |
-          OIDC_RESPONSE=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=crates.io" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
-          OIDC_TOKEN=$(echo "$OIDC_RESPONSE" | jq -r '.value')
-          if [ "$OIDC_TOKEN" = "null" ] || [ -z "$OIDC_TOKEN" ]; then
-            echo "::error::Failed to get OIDC token: $OIDC_RESPONSE"
-            exit 1
-          fi
-          EXCHANGE_RESPONSE=$(curl -sLS 'https://crates.io/api/v1/trusted_publishing/tokens' -H 'Content-Type: application/json' -H 'User-Agent: pklrust CI (github.com/ubugeeei/pklrust)' -d "{\"jwt\": \"$OIDC_TOKEN\"}")
-          CRATES_IO_TOKEN=$(echo "$EXCHANGE_RESPONSE" | jq -r '.token')
-          if [ "$CRATES_IO_TOKEN" = "null" ] || [ -z "$CRATES_IO_TOKEN" ]; then
-            echo "::error::Failed to exchange OIDC token: $EXCHANGE_RESPONSE"
-            exit 1
-          fi
-          echo "::add-mask::$CRATES_IO_TOKEN"
-          echo "token=$CRATES_IO_TOKEN" >> "$GITHUB_OUTPUT"
+          exit 1
 
       - name: Publish pklrust
         run: cargo publish -p pklrust
         env:
-          CARGO_REGISTRY_TOKEN: ${{ steps.oidc-pklrust.outputs.token }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.oidc.outputs.token }}
 
-      - name: Wait for pklrust to be available
+      - name: Wait for pklrust
         run: |
           VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "pklrust") | .version')
-          until curl -sf "https://crates.io/api/v1/crates/pklrust/$VERSION" > /dev/null; do
-            echo "Waiting for pklrust $VERSION on crates.io..."
-            sleep 5
+          for i in $(seq 1 60); do
+            curl -sf "https://crates.io/api/v1/crates/pklrust/$VERSION" \
+              -H 'User-Agent: pklrust CI (github.com/ubugeeei/pklrust)' > /dev/null && exit 0
+            echo "Waiting for pklrust $VERSION... ($i/60)"
+            sleep 10
           done
-
-      - name: Get OIDC token for pklrust-codegen
-        id: oidc-codegen
-        run: |
-          OIDC_RESPONSE=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=crates.io" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
-          OIDC_TOKEN=$(echo "$OIDC_RESPONSE" | jq -r '.value')
-          if [ "$OIDC_TOKEN" = "null" ] || [ -z "$OIDC_TOKEN" ]; then
-            echo "::error::Failed to get OIDC token: $OIDC_RESPONSE"
-            exit 1
-          fi
-          EXCHANGE_RESPONSE=$(curl -sLS 'https://crates.io/api/v1/trusted_publishing/tokens' -H 'Content-Type: application/json' -H 'User-Agent: pklrust CI (github.com/ubugeeei/pklrust)' -d "{\"jwt\": \"$OIDC_TOKEN\"}")
-          CRATES_IO_TOKEN=$(echo "$EXCHANGE_RESPONSE" | jq -r '.token')
-          if [ "$CRATES_IO_TOKEN" = "null" ] || [ -z "$CRATES_IO_TOKEN" ]; then
-            echo "::error::Failed to exchange OIDC token: $EXCHANGE_RESPONSE"
-            exit 1
-          fi
-          echo "::add-mask::$CRATES_IO_TOKEN"
-          echo "token=$CRATES_IO_TOKEN" >> "$GITHUB_OUTPUT"
+          exit 1
 
       - name: Publish pklrust-codegen
         run: cargo publish -p pklrust-codegen
         env:
-          CARGO_REGISTRY_TOKEN: ${{ steps.oidc-codegen.outputs.token }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.oidc.outputs.token }}

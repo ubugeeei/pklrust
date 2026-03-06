@@ -25,8 +25,18 @@ jobs:
       - name: Get OIDC token for pklrust-derive
         id: oidc-derive
         run: |
-          OIDC_TOKEN=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=crates.io" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
-          CRATES_IO_TOKEN=$(curl -sLS 'https://crates.io/api/v1/trusted_publishing/tokens' -H 'Content-Type: application/json' -d "{\"oidc_token\": \"$OIDC_TOKEN\"}" | jq -r '.token')
+          OIDC_RESPONSE=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=crates.io" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
+          OIDC_TOKEN=$(echo "$OIDC_RESPONSE" | jq -r '.value')
+          if [ "$OIDC_TOKEN" = "null" ] || [ -z "$OIDC_TOKEN" ]; then
+            echo "::error::Failed to get OIDC token: $OIDC_RESPONSE"
+            exit 1
+          fi
+          EXCHANGE_RESPONSE=$(curl -sLS 'https://crates.io/api/v1/trusted_publishing/tokens' -H 'Content-Type: application/json' -d "{\"oidc_token\": \"$OIDC_TOKEN\"}")
+          CRATES_IO_TOKEN=$(echo "$EXCHANGE_RESPONSE" | jq -r '.token')
+          if [ "$CRATES_IO_TOKEN" = "null" ] || [ -z "$CRATES_IO_TOKEN" ]; then
+            echo "::error::Failed to exchange OIDC token: $EXCHANGE_RESPONSE"
+            exit 1
+          fi
           echo "::add-mask::$CRATES_IO_TOKEN"
           echo "token=$CRATES_IO_TOKEN" >> "$GITHUB_OUTPUT"
 
@@ -46,8 +56,18 @@ jobs:
       - name: Get OIDC token for pklrust
         id: oidc-pklrust
         run: |
-          OIDC_TOKEN=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=crates.io" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
-          CRATES_IO_TOKEN=$(curl -sLS 'https://crates.io/api/v1/trusted_publishing/tokens' -H 'Content-Type: application/json' -d "{\"oidc_token\": \"$OIDC_TOKEN\"}" | jq -r '.token')
+          OIDC_RESPONSE=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=crates.io" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
+          OIDC_TOKEN=$(echo "$OIDC_RESPONSE" | jq -r '.value')
+          if [ "$OIDC_TOKEN" = "null" ] || [ -z "$OIDC_TOKEN" ]; then
+            echo "::error::Failed to get OIDC token: $OIDC_RESPONSE"
+            exit 1
+          fi
+          EXCHANGE_RESPONSE=$(curl -sLS 'https://crates.io/api/v1/trusted_publishing/tokens' -H 'Content-Type: application/json' -d "{\"oidc_token\": \"$OIDC_TOKEN\"}")
+          CRATES_IO_TOKEN=$(echo "$EXCHANGE_RESPONSE" | jq -r '.token')
+          if [ "$CRATES_IO_TOKEN" = "null" ] || [ -z "$CRATES_IO_TOKEN" ]; then
+            echo "::error::Failed to exchange OIDC token: $EXCHANGE_RESPONSE"
+            exit 1
+          fi
           echo "::add-mask::$CRATES_IO_TOKEN"
           echo "token=$CRATES_IO_TOKEN" >> "$GITHUB_OUTPUT"
 
@@ -67,8 +87,18 @@ jobs:
       - name: Get OIDC token for pklrust-codegen
         id: oidc-codegen
         run: |
-          OIDC_TOKEN=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=crates.io" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
-          CRATES_IO_TOKEN=$(curl -sLS 'https://crates.io/api/v1/trusted_publishing/tokens' -H 'Content-Type: application/json' -d "{\"oidc_token\": \"$OIDC_TOKEN\"}" | jq -r '.token')
+          OIDC_RESPONSE=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=crates.io" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
+          OIDC_TOKEN=$(echo "$OIDC_RESPONSE" | jq -r '.value')
+          if [ "$OIDC_TOKEN" = "null" ] || [ -z "$OIDC_TOKEN" ]; then
+            echo "::error::Failed to get OIDC token: $OIDC_RESPONSE"
+            exit 1
+          fi
+          EXCHANGE_RESPONSE=$(curl -sLS 'https://crates.io/api/v1/trusted_publishing/tokens' -H 'Content-Type: application/json' -d "{\"oidc_token\": \"$OIDC_TOKEN\"}")
+          CRATES_IO_TOKEN=$(echo "$EXCHANGE_RESPONSE" | jq -r '.token')
+          if [ "$CRATES_IO_TOKEN" = "null" ] || [ -z "$CRATES_IO_TOKEN" ]; then
+            echo "::error::Failed to exchange OIDC token: $EXCHANGE_RESPONSE"
+            exit 1
+          fi
           echo "::add-mask::$CRATES_IO_TOKEN"
           echo "token=$CRATES_IO_TOKEN" >> "$GITHUB_OUTPUT"
 

@@ -20,4 +20,4 @@ serde_json = "1"
 thiserror = "2"
 byteorder = "1"
 tokio = { version = "1", features = ["process", "io-util", "sync", "rt-multi-thread", "macros"], optional = true }
-pklrust-derive = { version = "0.6.0", path = "../pklrust-derive" }
+pklrust-derive = { version = "0.7.0", path = "../pklrust-derive" }

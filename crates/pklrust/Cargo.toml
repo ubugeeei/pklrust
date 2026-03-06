@@ -5,6 +5,7 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 description = "Rust bindings for Apple Pkl configuration language"
+readme = "../../README.md"
 
 [features]
 default = ["sync"]

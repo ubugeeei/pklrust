@@ -223,8 +223,7 @@ fn pkl_type_to_rust(pkl_type: &str) -> String {
 
 fn extract_generic(s: &str, prefix: &str) -> Option<String> {
     let s = s.trim();
-    if s.starts_with(prefix) {
-        let rest = &s[prefix.len()..];
+    if let Some(rest) = s.strip_prefix(prefix) {
         if let Some(inner) = rest.strip_prefix('<') {
             if let Some(inner) = inner.strip_suffix('>') {
                 return Some(inner.trim().to_string());
@@ -240,8 +239,7 @@ fn extract_generic(s: &str, prefix: &str) -> Option<String> {
 
 fn extract_map_generic(s: &str, prefix: &str) -> Option<(String, String)> {
     let s = s.trim();
-    if s.starts_with(prefix) {
-        let rest = &s[prefix.len()..];
+    if let Some(rest) = s.strip_prefix(prefix) {
         if let Some(inner) = rest.strip_prefix('<') {
             if let Some(inner) = inner.strip_suffix('>') {
                 // Find the comma that separates key and value types

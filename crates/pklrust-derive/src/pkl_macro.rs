@@ -233,10 +233,7 @@ fn emit_tokens(trees: &[TokenTree], ctx: Context) -> String {
 
 /// Should we add a space before the current token given what came before?
 fn needs_space(last: Last) -> bool {
-    match last {
-        Last::Start | Last::JointPunct | Last::GluePunct => false,
-        _ => true,
-    }
+    !matches!(last, Last::Start | Last::JointPunct | Last::GluePunct)
 }
 
 #[cfg(test)]

@@ -218,8 +218,9 @@ fn decode_duration(slots: &[Value]) -> Result<PklValue> {
     let unit_str = slots[1]
         .as_str()
         .ok_or_else(|| Error::Decode("duration unit must be string".into()))?;
-    let unit = DurationUnit::from_str(unit_str)
-        .ok_or_else(|| Error::Decode(format!("unknown duration unit: {unit_str}")))?;
+    let unit = unit_str
+        .parse::<DurationUnit>()
+        .map_err(Error::Decode)?;
     Ok(PklValue::Duration(Duration::new(value, unit)))
 }
 
@@ -233,8 +234,9 @@ fn decode_data_size(slots: &[Value]) -> Result<PklValue> {
     let unit_str = slots[1]
         .as_str()
         .ok_or_else(|| Error::Decode("data size unit must be string".into()))?;
-    let unit = DataSizeUnit::from_str(unit_str)
-        .ok_or_else(|| Error::Decode(format!("unknown data size unit: {unit_str}")))?;
+    let unit = unit_str
+        .parse::<DataSizeUnit>()
+        .map_err(Error::Decode)?;
     Ok(PklValue::DataSize(DataSize::new(value, unit)))
 }
 

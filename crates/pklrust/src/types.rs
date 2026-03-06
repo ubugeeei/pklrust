@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -12,19 +14,24 @@ pub enum DurationUnit {
     D,
 }
 
-impl DurationUnit {
-    pub fn from_str(s: &str) -> Option<Self> {
+impl FromStr for DurationUnit {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "ns" => Some(Self::Ns),
-            "us" => Some(Self::Us),
-            "ms" => Some(Self::Ms),
-            "s" => Some(Self::S),
-            "min" => Some(Self::Min),
-            "h" => Some(Self::H),
-            "d" => Some(Self::D),
-            _ => None,
+            "ns" => Ok(Self::Ns),
+            "us" => Ok(Self::Us),
+            "ms" => Ok(Self::Ms),
+            "s" => Ok(Self::S),
+            "min" => Ok(Self::Min),
+            "h" => Ok(Self::H),
+            "d" => Ok(Self::D),
+            _ => Err(format!("unknown duration unit: {s}")),
         }
     }
+}
+
+impl DurationUnit {
 
     pub fn as_str(&self) -> &'static str {
         match self {
@@ -88,23 +95,28 @@ pub enum DataSizeUnit {
     Pib,
 }
 
-impl DataSizeUnit {
-    pub fn from_str(s: &str) -> Option<Self> {
+impl FromStr for DataSizeUnit {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "b" => Some(Self::B),
-            "kb" => Some(Self::Kb),
-            "mb" => Some(Self::Mb),
-            "gb" => Some(Self::Gb),
-            "tb" => Some(Self::Tb),
-            "pb" => Some(Self::Pb),
-            "kib" => Some(Self::Kib),
-            "mib" => Some(Self::Mib),
-            "gib" => Some(Self::Gib),
-            "tib" => Some(Self::Tib),
-            "pib" => Some(Self::Pib),
-            _ => None,
+            "b" => Ok(Self::B),
+            "kb" => Ok(Self::Kb),
+            "mb" => Ok(Self::Mb),
+            "gb" => Ok(Self::Gb),
+            "tb" => Ok(Self::Tb),
+            "pb" => Ok(Self::Pb),
+            "kib" => Ok(Self::Kib),
+            "mib" => Ok(Self::Mib),
+            "gib" => Ok(Self::Gib),
+            "tib" => Ok(Self::Tib),
+            "pib" => Ok(Self::Pib),
+            _ => Err(format!("unknown data size unit: {s}")),
         }
     }
+}
+
+impl DataSizeUnit {
 
     pub fn as_str(&self) -> &'static str {
         match self {

@@ -5,6 +5,7 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 description = "Code generator for Apple Pkl to Rust (pkl-gen-rust)"
+readme = "../../README.md"
 
 [[bin]]
 name = "pkl-gen-rust"

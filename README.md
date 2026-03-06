@@ -18,7 +18,7 @@ This library communicates with `pkl server` via MessagePack IPC, providing a nat
 
 ```toml
 [dependencies]
-pklrust = "0.1"
+pklrust = "0.2"
 serde = { version = "1", features = ["derive"] }
 ```
 

@@ -89,7 +89,7 @@ impl EvaluatorManager {
         };
 
         self.process
-            .send(&OutgoingMessage::CreateEvaluatorRequest(req))?;
+            .send(&OutgoingMessage::CreateEvaluatorRequest(Box::new(req)))?;
 
         // Read response
         let resp = self.process.recv()?;
@@ -167,16 +167,16 @@ impl EvaluatorManager {
                     eprintln!("[pkl {level}] {}: {}", log.frame_uri, log.message);
                 }
                 IncomingMessage::ReadResourceRequest(req) => {
-                    self.handle_read_resource(&evaluator, &req)?;
+                    self.handle_read_resource(evaluator, &req)?;
                 }
                 IncomingMessage::ReadModuleRequest(req) => {
-                    self.handle_read_module(&evaluator, &req)?;
+                    self.handle_read_module(evaluator, &req)?;
                 }
                 IncomingMessage::ListResourcesRequest(req) => {
-                    self.handle_list_resources(&evaluator, &req)?;
+                    self.handle_list_resources(evaluator, &req)?;
                 }
                 IncomingMessage::ListModulesRequest(req) => {
-                    self.handle_list_modules(&evaluator, &req)?;
+                    self.handle_list_modules(evaluator, &req)?;
                 }
                 _ => {
                     return Err(Error::UnexpectedMessageType(0));

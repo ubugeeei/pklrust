@@ -57,7 +57,7 @@ pub enum IncomingMessage {
 /// Outgoing messages to the pkl server.
 #[derive(Debug, Clone)]
 pub enum OutgoingMessage {
-    CreateEvaluatorRequest(CreateEvaluatorRequest),
+    CreateEvaluatorRequest(Box<CreateEvaluatorRequest>),
     CloseEvaluator(CloseEvaluator),
     EvaluateRequest(EvaluateRequest),
     ReadResourceResponse(ReadResourceResponse),

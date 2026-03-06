@@ -190,7 +190,7 @@ checksum = "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
 
 [[package]]
 name = "pklrust"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "byteorder",
  "pklrust-derive",
@@ -204,14 +204,14 @@ dependencies = [
 
 [[package]]
 name = "pklrust-codegen"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "clap",
 ]
 
 [[package]]
 name = "pklrust-derive"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "proc-macro2",
  "quote",
